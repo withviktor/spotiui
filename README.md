@@ -89,6 +89,24 @@ If you prefer not to use Docker on the Kiosk device (e.g. standard Raspberry Pi 
     *   Start a local web server.
     *   Automatically launch Chromium in Kiosk mode pointing to the client.
 
+### Autostart on Boot (Raspberry Pi)
+
+To have the Kiosk launch automatically when the Raspberry Pi boots:
+
+1.  SSH into your Raspberry Pi.
+2.  Navigate to the project folder.
+3.  Run the autostart setup script with your API URL:
+    ```bash
+    chmod +x setup-autostart.sh
+    ./setup-autostart.sh http://my-server.com:3001
+    ```
+4.  Reboot the Pi:
+    ```bash
+    sudo reboot
+    ```
+    
+The client should now start automatically on the connected display.
+
 ## Architecture
 
 *   **Client:** React + Vite + TypeScript. Connects via Socket.IO.

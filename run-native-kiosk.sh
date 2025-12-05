@@ -3,6 +3,11 @@
 # SpotiUI Native Kiosk Launcher
 # Usage: ./run-native-kiosk.sh [API_URL]
 
+# 0. Setup Environment
+# Ensure we know where we are, regardless of where the script is called from
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export DISPLAY=:0
+
 API_URL=${1:-http://localhost:3001}
 PORT=3000
 
@@ -11,8 +16,22 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# 1. Environment Checks
+# 1. Environment Checks & Power Management
 echo "🔍 Checking environment..."
+
+# Disable Screen Blanking / Power Saving
+if command_exists xset; then
+    echo "💡 Disabling screen blanking..."
+    xset s noblank
+    xset s off
+    xset -dpms
+fi
+
+# Hide Cursor (if unclutter is installed)
+if command_exists unclutter; then
+    echo "🖱️  Hiding cursor..."
+    unclutter -idle 0 &
+fi
 
 if ! command_exists node; then
     echo "❌ Error: Node.js is not installed. Please install Node.js v18+."
@@ -32,9 +51,11 @@ fi
 
 # 2. Build & Configure Client
 echo "🚀 Preparing SpotiUI Client..."
+echo "📂 Working Directory: $DIR"
 echo "🔗 API URL: $API_URL"
 
-cd client || exit 1
+# Navigate to client directory using absolute path
+cd "$DIR/client" || exit 1
 
 # Check for node_modules or specifically the serve binary
 if [ ! -d "node_modules" ] || [ ! -f "node_modules/.bin/serve" ]; then
@@ -66,7 +87,7 @@ trap "kill $SERVER_PID" EXIT
 
 # Wait a moment for server to start
 echo "⏳ Waiting for server to initialize..."
-sleep 3
+sleep 5
 
 # 4. Launch Kiosk
 if [ -n "$BROWSER_CMD" ]; then
@@ -85,6 +106,7 @@ if [ -n "$BROWSER_CMD" ]; then
         --check-for-update-interval=31536000 \
         --disable-pinch \
         --overscroll-history-navigation=0 \
+        --autoplay-policy=no-user-gesture-required \
         "http://localhost:$PORT"
 else
     echo "✅ Server running at http://localhost:$PORT"
