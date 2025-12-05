@@ -75,6 +75,20 @@ This project is designed to be split: the **API** runs on a stable cloud server,
     chromium-browser --kiosk --noerrdialogs --disable-infobars http://localhost
     ```
 
+### Alternative: Native Client (No Docker)
+If you prefer not to use Docker on the Kiosk device (e.g. standard Raspberry Pi OS Lite), you can run the client natively using the all-in-one script.
+
+1.  Ensure **Node.js 18+** is installed on the device.
+2.  Run the kiosk launcher:
+    ```bash
+    chmod +x run-native-kiosk.sh
+    ./run-native-kiosk.sh http://my-server.com:3001
+    ```
+3.  This script will:
+    *   Install dependencies and build the client (if needed).
+    *   Start a local web server.
+    *   Automatically launch Chromium in Kiosk mode pointing to the client.
+
 ## Architecture
 
 *   **Client:** React + Vite + TypeScript. Connects via Socket.IO.
