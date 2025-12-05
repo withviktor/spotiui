@@ -8,7 +8,7 @@ const getApiUrl = () => {
   if (window.SPOTIUI_CONFIG && window.SPOTIUI_CONFIG.API_URL) {
     return window.SPOTIUI_CONFIG.API_URL;
   }
-  return 'http://localhost:3001';
+  return 'https://t48oogcowg4os04484oowgog.blushing-bug.bylinemark.com';
 };
 
 const socket: Socket = io(getApiUrl());

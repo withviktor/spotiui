@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Default to localhost if not set
-API_URL=${API_URL:-http://localhost:3001}
+API_URL=${API_URL:-https://t48oogcowg4os04484oowgog.blushing-bug.bylinemark.com}
 
 echo "Injecting API_URL: $API_URL"
 

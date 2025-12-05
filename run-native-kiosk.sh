@@ -3,12 +3,37 @@
 # SpotiUI Native Kiosk Launcher
 # Usage: ./run-native-kiosk.sh [API_URL]
 
-# 0. Setup Environment
-# Ensure we know where we are, regardless of where the script is called from
+# 0. Setup Logging & Environment
+LOG_FILE="$HOME/spotiui-kiosk.log"
+
+# Redirect stdout and stderr to log file
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+echo "----------------------------------------"
+echo "📅 Starting SpotiUI Kiosk: $(date)"
+
+# Ensure we know where we are
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export DISPLAY=:0
 
-API_URL=${1:-http://localhost:3001}
+# Load User Environment (crucial for NVM/Node)
+if [ -f "$HOME/.bashrc" ]; then
+    echo "📥 Sourcing .bashrc..."
+    source "$HOME/.bashrc"
+fi
+if [ -f "$HOME/.profile" ]; then
+    echo "📥 Sourcing .profile..."
+    source "$HOME/.profile"
+fi
+
+# Explicitly try to load NVM if present (common issue on Pi)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+echo "🌍 PATH: $PATH"
+echo "📂 Working Directory: $DIR"
+
+API_URL=${1:-https://t48oogcowg4os04484oowgog.blushing-bug.bylinemark.com}
 PORT=3000
 
 # Function to check if a command exists

@@ -6,5 +6,5 @@ services:
     ports:
       - "80:80"
     environment:
-      - API_URL=${API_URL:-http://localhost:3001}
+      - API_URL=${API_URL:-https://t48oogcowg4os04484oowgog.blushing-bug.bylinemark.com}
     restart: always

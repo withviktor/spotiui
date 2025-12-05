@@ -3,7 +3,7 @@
 # Setup Autostart for SpotiUI Kiosk
 # Usage: ./setup-autostart.sh [API_URL]
 
-API_URL=${1:-http://localhost:3001}
+API_URL=${1:-https://t48oogcowg4os04484oowgog.blushing-bug.bylinemark.com}
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 AUTOSTART_DIR="$HOME/.config/autostart"
 DESKTOP_FILE="$AUTOSTART_DIR/spotiui.desktop"

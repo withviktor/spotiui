@@ -2,7 +2,7 @@
 
 # Configuration
 # Set this to your Cloud API URL
-API_URL=${1:-http://localhost:3001} 
+API_URL=${1:-https://t48oogcowg4os04484oowgog.blushing-bug.bylinemark.com} 
 
 echo "Setting up Kiosk Client..."
 echo "Using API URL: $API_URL"
