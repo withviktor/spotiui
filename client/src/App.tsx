@@ -49,7 +49,7 @@ function App() {
   const [localProgress, setLocalProgress] = useState(0);
   const [dominantColor, setDominantColor] = useState<string>('#121212');
   const [loginUrl, setLoginUrl] = useState<string>('');
-  const progressInterval = useRef<NodeJS.Timeout | null>(null);
+  const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const accessToken = localStorage.getItem('spotify_access_token');
@@ -66,7 +66,6 @@ function App() {
       }
       
       // Construct Login URL for QR Code
-      const host = window.location.hostname; 
       let apiUrl = getApiUrl();
       // If we are getting the API URL from config (which might be the cloud URL), we use that.
       // If we are defaulting to localhost (dev), we try to infer.
