@@ -47,7 +47,6 @@ const SCOPES = [
   'user-modify-playback-state', // for queue
   'user-read-private',
   'user-read-email',
-  'app-remote-control',
   'streaming'
 ].join(' ');
 

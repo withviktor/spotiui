@@ -52,22 +52,33 @@ function App() {
   const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    let accessToken = localStorage.getItem('spotify_access_token');
-    let refreshToken = localStorage.getItem('spotify_refresh_token');
+    // Initial Auth Check
+    const accessToken = localStorage.getItem('spotify_access_token');
+    const refreshToken = localStorage.getItem('spotify_refresh_token');
 
-    // Clean up invalid tokens
-    if (accessToken === 'undefined') accessToken = null;
-    if (refreshToken === 'undefined') refreshToken = null;
-
-    if (accessToken) {
+    if (accessToken && accessToken !== 'undefined') {
+      console.log("Found existing tokens, authenticating...");
       socket.emit('authenticate', { accessToken, refreshToken });
     }
 
     function onConnect() {
+      console.log("Socket connected:", socket.id);
       setIsConnected(true);
-      if (accessToken) {
-         socket.emit('authenticate', { accessToken, refreshToken });
+      
+      // Read fresh tokens from storage
+      const storedAccess = localStorage.getItem('spotify_access_token');
+      const storedRefresh = localStorage.getItem('spotify_refresh_token');
+
+      if (storedAccess && storedAccess !== 'undefined') {
+         console.log("Re-authenticating on connect...");
+         socket.emit('authenticate', { accessToken: storedAccess, refreshToken: storedRefresh });
       }
+      
+      // Construct Login URL...
+      let apiUrl = getApiUrl();
+      apiUrl = apiUrl.replace(/\/$/, "");
+      setLoginUrl(`${apiUrl}/login?socketId=${socket.id}`);
+    }
       
       // Construct Login URL for QR Code
       let apiUrl = getApiUrl();
