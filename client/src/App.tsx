@@ -79,25 +79,6 @@ function App() {
       apiUrl = apiUrl.replace(/\/$/, "");
       setLoginUrl(`${apiUrl}/login?socketId=${socket.id}`);
     }
-      
-      // Construct Login URL for QR Code
-      let apiUrl = getApiUrl();
-      // If we are getting the API URL from config (which might be the cloud URL), we use that.
-      // If we are defaulting to localhost (dev), we try to infer.
-      
-      // However, for the QR code to work on a phone, it MUST point to a reachable IP/Domain.
-      // If the Kiosk is configured with a Cloud API URL in config.js, use that.
-      // If not, we might be in trouble if we just use 'localhost'.
-      
-      // Let's rely on the socket URL first, as that is where we want to connect.
-      // But we need the http endpoint for the login route.
-      // socket.io-client url usually doesn't have path unless specified.
-      
-      // Clean up the URL (remove trailing slash if any)
-      apiUrl = apiUrl.replace(/\/$/, "");
-      
-      setLoginUrl(`${apiUrl}/login?socketId=${socket.id}`);
-    }
 
     function onDisconnect() {
       setIsConnected(false);
