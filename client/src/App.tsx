@@ -52,16 +52,20 @@ function App() {
   const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('spotify_access_token');
-    const refreshToken = localStorage.getItem('spotify_refresh_token');
+    let accessToken = localStorage.getItem('spotify_access_token');
+    let refreshToken = localStorage.getItem('spotify_refresh_token');
 
-    if (accessToken && refreshToken) {
+    // Clean up invalid tokens
+    if (accessToken === 'undefined') accessToken = null;
+    if (refreshToken === 'undefined') refreshToken = null;
+
+    if (accessToken) {
       socket.emit('authenticate', { accessToken, refreshToken });
     }
 
     function onConnect() {
       setIsConnected(true);
-      if (accessToken && refreshToken) {
+      if (accessToken) {
          socket.emit('authenticate', { accessToken, refreshToken });
       }
       
@@ -91,8 +95,12 @@ function App() {
     function onLoginSuccess(tokens?: { accessToken: string, refreshToken: string }) {
       console.log("Logged in successfully!", tokens);
       if (tokens) {
-          localStorage.setItem('spotify_access_token', tokens.accessToken);
-          localStorage.setItem('spotify_refresh_token', tokens.refreshToken);
+          if (tokens.accessToken && tokens.accessToken !== 'undefined') {
+             localStorage.setItem('spotify_access_token', tokens.accessToken);
+          }
+          if (tokens.refreshToken && tokens.refreshToken !== 'undefined') {
+             localStorage.setItem('spotify_refresh_token', tokens.refreshToken);
+          }
       }
       setIsLoggedIn(true);
     }

@@ -116,6 +116,8 @@ app.get('/callback', async (req, res) => {
     // In `spotify-api.js`, `client.refreshMeta` might hold it.
     
     const refreshToken = client.refreshMeta?.refreshToken;
+    
+    console.log(`Login success for socket ${socketId}. Access Token present. Refresh Token present: ${!!refreshToken}`);
 
     // Send tokens to the connected client via WebSocket
     io.to(socketId).emit('login_success', { 
@@ -178,30 +180,30 @@ io.on('connection', (socket) => {
   socket.on('authenticate', async ({ accessToken, refreshToken }) => {
     try {
         let client;
-        if (refreshToken) {
+        // Sanitize refreshToken
+        const validRefreshToken = (refreshToken && refreshToken !== 'undefined' && refreshToken !== '') ? refreshToken : null;
+
+        if (validRefreshToken) {
+             console.log(`Authenticating socket ${socket.id} with Refresh Token`);
              client = await Client.create({
                 token: {
                     clientID: SPOTIFY_CLIENT_ID!,
                     clientSecret: SPOTIFY_CLIENT_SECRET!,
                     redirectURL: SPOTIFY_REDIRECT_URI!,
-                    refreshToken: refreshToken
+                    refreshToken: validRefreshToken
                 }
             });
         } else {
-            // Fallback if we only have accessToken (might expire quickly)
-            // But usually we should have both.
+             console.log(`Authenticating socket ${socket.id} with Access Token only`);
+             // Fallback if we only have accessToken (might expire quickly)
              client = await Client.create({
                 token: {
                     clientID: SPOTIFY_CLIENT_ID!,
                     clientSecret: SPOTIFY_CLIENT_SECRET!,
                     redirectURL: SPOTIFY_REDIRECT_URI!,
-                    code: "dummy", // The library might need a structural placeholder if we don't have a better way
-                    // actually if we just pass the token string to constructor it might work, 
-                    // but Client.create expects the object for auth flow.
-                    // Let's assume refreshToken is always present for this flow.
+                    code: "dummy" 
                 }
             });
-            // Manual override if needed
             client.token = accessToken;
         }
 
