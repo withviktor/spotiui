@@ -101,6 +101,12 @@ function App() {
           if (tokens.refreshToken && tokens.refreshToken !== 'undefined') {
              localStorage.setItem('spotify_refresh_token', tokens.refreshToken);
           }
+          
+          // Immediately authenticate with the new tokens to start polling
+          socket.emit('authenticate', { 
+            accessToken: tokens.accessToken, 
+            refreshToken: tokens.refreshToken 
+          });
       }
       setIsLoggedIn(true);
     }

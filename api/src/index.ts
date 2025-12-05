@@ -155,7 +155,7 @@ function startPolling(socketId: string, client: Client) {
     clearInterval(pollingIntervals.get(socketId));
   }
 
-  const interval = setInterval(async () => {
+  const poll = async () => {
     try {
       const playback = await client.user.player.getCurrentPlayback();
       const queue = await client.fetch('/me/player/queue');
@@ -169,7 +169,13 @@ function startPolling(socketId: string, client: Client) {
     } catch (error) {
         console.error(`Error polling for socket ${socketId}:`, error);
     }
-  }, 3000);
+  };
+
+  // Run immediately
+  poll();
+
+  // Then run interval
+  const interval = setInterval(poll, 3000);
 
   pollingIntervals.set(socketId, interval);
 }
