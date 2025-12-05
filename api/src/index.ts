@@ -44,7 +44,9 @@ const SCOPES = [
   'user-read-currently-playing',
   'user-modify-playback-state', // for queue
   'user-read-private',
-  'user-read-email'
+  'user-read-email',
+  'app-remote-control',
+  'streaming'
 ].join(' ');
 
 app.get('/', (req, res) => {
@@ -154,6 +156,8 @@ function startPolling(socketId: string, client: Client) {
       const playback = await client.user.player.getCurrentPlayback();
       const queue = await client.fetch('/me/player/queue');
       
+      console.log(`Socket ${socketId} playback update:`, playback ? `Playing: ${playback.item?.name}` : "No playback");
+
       io.to(socketId).emit('playback_update', {
         playback,
         queue

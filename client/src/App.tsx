@@ -98,6 +98,7 @@ function App() {
     }
 
     function onPlaybackUpdate(newData: SpotifyData) {
+      console.log("Received playback update:", newData);
       setData(newData);
       if (newData.playback) {
         setLocalProgress(newData.playback.progress || 0);
