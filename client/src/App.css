@@ -156,7 +156,11 @@
   margin: 0 0 0.25rem 0;
   color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
-  white-space: nowrap;
+  
+  /* Allow multi-line */
+  white-space: normal; 
+  word-wrap: break-word;
+
   overflow: hidden;
   text-overflow: ellipsis;
 }
