@@ -36,7 +36,8 @@ echo "🔗 API URL: $API_URL"
 
 cd client || exit 1
 
-if [ ! -d "node_modules" ]; then
+# Check for node_modules or specifically the serve binary
+if [ ! -d "node_modules" ] || [ ! -f "node_modules/.bin/serve" ]; then
     echo "📦 Installing dependencies..."
     npm install
 fi
@@ -52,8 +53,12 @@ echo "window.SPOTIUI_CONFIG = { API_URL: \"$API_URL\" };" > dist/config.js
 
 # 3. Start Server
 echo "🟢 Starting local server on port $PORT..."
-# Start 'serve' in the background
-npx serve -s dist -l $PORT &
+# Prefer local binary to avoid npx cache issues
+if [ -f "node_modules/.bin/serve" ]; then
+    ./node_modules/.bin/serve -s dist -l $PORT &
+else
+    npx serve -s dist -l $PORT &
+fi
 SERVER_PID=$!
 
 # Ensure we kill the server when this script exits
