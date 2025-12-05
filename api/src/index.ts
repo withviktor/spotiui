@@ -157,8 +157,11 @@ function startPolling(socketId: string, client: Client) {
 
   const poll = async () => {
     try {
-      const playback = await client.user.player.getCurrentPlayback();
-      const queue = await client.fetch('/me/player/queue');
+      // Fetch in parallel for speed
+      const [playback, queue] = await Promise.all([
+         client.user.player.getCurrentPlayback(),
+         client.fetch('/me/player/queue')
+      ]);
       
       console.log(`Socket ${socketId} playback update:`, playback ? `Playing: ${playback.item?.name}` : "No playback");
 
@@ -174,8 +177,8 @@ function startPolling(socketId: string, client: Client) {
   // Run immediately
   poll();
 
-  // Then run interval
-  const interval = setInterval(poll, 3000);
+  // Then run interval - Reduced to 1.5s for snappier updates
+  const interval = setInterval(poll, 1500);
 
   pollingIntervals.set(socketId, interval);
 }
@@ -184,6 +187,7 @@ io.on('connection', (socket) => {
   console.log('A client connected:', socket.id);
 
   socket.on('authenticate', async ({ accessToken, refreshToken }) => {
+    console.log(`Received authenticate request for socket ${socket.id}`);
     try {
         let client;
         // Sanitize refreshToken
@@ -201,7 +205,6 @@ io.on('connection', (socket) => {
             });
         } else {
              console.log(`Authenticating socket ${socket.id} with Access Token only`);
-             // Fallback if we only have accessToken (might expire quickly)
              client = await Client.create({
                 token: {
                     clientID: SPOTIFY_CLIENT_ID!,
@@ -214,10 +217,18 @@ io.on('connection', (socket) => {
         }
 
         spotifyClients.set(socket.id, client);
-        io.to(socket.id).emit('login_success', { message: "Authenticated successfully" });
+        // We do NOT emit login_success here to avoid loop or confusion, 
+        // as the client logic might trigger re-renders. 
+        // But the client listens to login_success to set isLoggedIn=true.
+        // If we are reconnecting, we might need it.
+        // However, the main flow is: Client emits authenticate -> Server starts polling.
+        // We should emit a specific "ready" event or just start polling.
+        
+        console.log(`Authentication successful for socket ${socket.id}. Starting polling.`);
         startPolling(socket.id, client);
+        
     } catch (e) {
-        console.error("Auth failed", e);
+        console.error(`Auth failed for socket ${socket.id}:`, e);
     }
   });
 
