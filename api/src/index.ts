@@ -14,7 +14,9 @@ const io = new Server(httpServer, {
   cors: {
     origin: "*", 
     methods: ["GET", "POST"]
-  }
+  },
+  pingTimeout: 60000, // Increase to 60 seconds
+  pingInterval: 25000 // Send ping every 25 seconds
 });
 
 app.use(cors());

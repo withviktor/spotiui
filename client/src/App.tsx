@@ -211,6 +211,21 @@ function App() {
         <div className="background-image default-bg" />
         <div className="background-overlay" />
         <div className="app-container" style={{ justifyContent: 'center' }}>
+          {!isConnected && (
+            <div style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: 'rgba(255, 0, 0, 0.7)',
+                color: 'white',
+                padding: '0.5rem 1rem',
+                borderRadius: '8px',
+                zIndex: 1000,
+                backdropFilter: 'blur(4px)'
+            }}>
+                Reconnecting...
+            </div>
+          )}
           <div className="glass-panel waiting-panel">
             <div className="waiting-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -244,6 +259,21 @@ function App() {
       />
       
       <div className="app-container">
+        {!isConnected && (
+            <div style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: 'rgba(255, 0, 0, 0.7)',
+                color: 'white',
+                padding: '0.5rem 1rem',
+                borderRadius: '8px',
+                zIndex: 1000,
+                backdropFilter: 'blur(4px)'
+            }}>
+                Reconnecting...
+            </div>
+        )}
         <div className="glass-panel now-playing">
           {image && <img src={image} alt="Album Art" className="album-art" />}
           <div className="track-info">
