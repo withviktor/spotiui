@@ -198,7 +198,7 @@
 .progress-bar-fill {
   height: 100%;
   border-radius: 99px;
-  transition: width 1s ease-in-out;
+  transition: width 1s linear;
   box-shadow: 0 0 15px currentColor;
 }
 

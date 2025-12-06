@@ -50,6 +50,8 @@ function App() {
   const [dominantColor, setDominantColor] = useState<string>('#121212');
   const [loginUrl, setLoginUrl] = useState<string>('');
   const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastUpdateRef = useRef<number>(Date.now());
+  const serverProgressRef = useRef<number>(0);
 
   useEffect(() => {
     // Initial Auth Check
@@ -107,7 +109,10 @@ function App() {
       console.log("Received playback update:", newData);
       setData(newData);
       if (newData.playback) {
-        setLocalProgress(newData.playback.progress || 0);
+        const progress = newData.playback.progress || 0;
+        setLocalProgress(progress);
+        serverProgressRef.current = progress;
+        lastUpdateRef.current = Date.now();
       }
     }
 
@@ -130,10 +135,13 @@ function App() {
       if (progressInterval.current) clearInterval(progressInterval.current);
 
       progressInterval.current = setInterval(() => {
-        setLocalProgress((prev) => {
+        setLocalProgress((_prev) => {
+          const now = Date.now();
+          const elapsed = now - lastUpdateRef.current;
+          const current = serverProgressRef.current + elapsed;
           const duration = data.playback?.item?.duration || 0;
-          if (prev >= duration) return duration;
-          return prev + 1000;
+          if (current >= duration) return duration;
+          return current;
         });
       }, 1000);
     } else {
