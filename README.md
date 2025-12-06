@@ -2,7 +2,7 @@
 
 A modern, kiosk-friendly Spotify player designed for TVs and displays. It features a centralized API for authentication and a sleek, glassmorphic React client.
 
-![SpotiUI](https://via.placeholder.com/800x450?text=SpotiUI+Kiosk+Preview)
+![SpotiUI](https://placehold.co/800x450/1DB954/white/?text=SpotiUI+Kiosk+Preview)
 
 ## Features
 
