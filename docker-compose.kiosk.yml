@@ -3,8 +3,8 @@ version: '3.8'
 services:
   client:
     build: ./client
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     environment:
       - API_URL=${API_URL:-https://t48oogcowg4os04484oowgog.blushing-bug.bylinemark.com}
     restart: always
