@@ -156,6 +156,8 @@ function startPolling(socketId: string, client: Client) {
 
   const poll = async () => {
     try {
+      console.log(`socket ${socketId} has product ${client.user.product}`);
+
       // Fetch in parallel for speed
       let playback, queue;
 
@@ -166,10 +168,8 @@ function startPolling(socketId: string, client: Client) {
         ]);
       } else {
         playback = await client.user.player.getCurrentPlayback();
-        queue = await client.fetch('/me/player/queue');
       }
 
-      console.log(`socket ${socketId} has product ${client.user.product}`);
 
       console.log(`Socket ${socketId} playback update:`, playback ? `Playing: ${playback.item?.name}` : "No playback");
 
