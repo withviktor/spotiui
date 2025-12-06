@@ -17,4 +17,4 @@ echo "Client is running on http://localhost"
 
 # Instructions for Kiosk Mode (Linux/Raspberry Pi)
 echo "To launch in Kiosk mode manually:"
-echo "chromium-browser --kiosk --noerrdialogs --disable-infobars http://localhost"
+echo "chromium-browser --kiosk --noerrdialogs --disable-infobars --password-store=basic http://localhost"

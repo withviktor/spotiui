@@ -132,6 +132,7 @@ if [ -n "$BROWSER_CMD" ]; then
         --disable-pinch \
         --overscroll-history-navigation=0 \
         --autoplay-policy=no-user-gesture-required \
+        --password-store=basic \
         "http://localhost:$PORT"
 else
     echo "✅ Server running at http://localhost:$PORT"
