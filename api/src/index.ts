@@ -216,12 +216,10 @@ io.on('connection', (socket) => {
         }
 
         spotifyClients.set(socket.id, client);
-        // We do NOT emit login_success here to avoid loop or confusion, 
-        // as the client logic might trigger re-renders. 
-        // But the client listens to login_success to set isLoggedIn=true.
-        // If we are reconnecting, we might need it.
-        // However, the main flow is: Client emits authenticate -> Server starts polling.
-        // We should emit a specific "ready" event or just start polling.
+        
+        // Emit login_success with NO tokens to avoid client re-authentication loop
+        // The client only re-emits 'authenticate' if tokens are present in the payload
+        socket.emit('login_success');
         
         console.log(`Authentication successful for socket ${socket.id}. Starting polling.`);
         startPolling(socket.id, client);
