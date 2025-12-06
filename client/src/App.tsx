@@ -64,16 +64,16 @@ function App() {
     function onConnect() {
       console.log("Socket connected:", socket.id);
       setIsConnected(true);
-      
+
       // Read fresh tokens from storage
       const storedAccess = localStorage.getItem('spotify_access_token');
       const storedRefresh = localStorage.getItem('spotify_refresh_token');
 
       if (storedAccess && storedAccess !== 'undefined') {
-         console.log("Re-authenticating on connect...");
-         socket.emit('authenticate', { accessToken: storedAccess, refreshToken: storedRefresh });
+        console.log("Re-authenticating on connect...");
+        socket.emit('authenticate', { accessToken: storedAccess, refreshToken: storedRefresh });
       }
-      
+
       // Construct Login URL...
       let apiUrl = getApiUrl();
       apiUrl = apiUrl.replace(/\/$/, "");
@@ -87,18 +87,18 @@ function App() {
     function onLoginSuccess(tokens?: { accessToken: string, refreshToken: string }) {
       console.log("Logged in successfully!", tokens);
       if (tokens) {
-          if (tokens.accessToken && tokens.accessToken !== 'undefined') {
-             localStorage.setItem('spotify_access_token', tokens.accessToken);
-          }
-          if (tokens.refreshToken && tokens.refreshToken !== 'undefined') {
-             localStorage.setItem('spotify_refresh_token', tokens.refreshToken);
-          }
-          
-          // Immediately authenticate with the new tokens to start polling
-          socket.emit('authenticate', { 
-            accessToken: tokens.accessToken, 
-            refreshToken: tokens.refreshToken 
-          });
+        if (tokens.accessToken && tokens.accessToken !== 'undefined') {
+          localStorage.setItem('spotify_access_token', tokens.accessToken);
+        }
+        if (tokens.refreshToken && tokens.refreshToken !== 'undefined') {
+          localStorage.setItem('spotify_refresh_token', tokens.refreshToken);
+        }
+
+        // Immediately authenticate with the new tokens to start polling
+        socket.emit('authenticate', {
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken
+        });
       }
       setIsLoggedIn(true);
     }
@@ -128,12 +128,12 @@ function App() {
   useEffect(() => {
     if (data?.playback?.isPlaying) {
       if (progressInterval.current) clearInterval(progressInterval.current);
-      
+
       progressInterval.current = setInterval(() => {
         setLocalProgress((prev) => {
-             const duration = data.playback?.item?.duration || 0;
-             if (prev >= duration) return duration;
-             return prev + 1000;
+          const duration = data.playback?.item?.duration || 0;
+          if (prev >= duration) return duration;
+          return prev + 1000;
         });
       }, 1000);
     } else {
@@ -157,9 +157,9 @@ function App() {
           // Or we could try to "invert" it, but inversion of dark grey is light grey.
           // Simple heuristic:
           if (color.isDark) {
-             setDominantColor('#ffffff'); // Fallback to white for visibility
+            setDominantColor('#ffffff'); // Fallback to white for visibility
           } else {
-             setDominantColor(color.hex);
+            setDominantColor(color.hex);
           }
         })
         .catch(e => {
@@ -174,7 +174,7 @@ function App() {
     const height = 600;
     const left = window.screen.width / 2 - width / 2;
     const top = window.screen.height / 2 - height / 2;
-    
+
     // Fallback to localhost if handleLogin is clicked manually (desktop flow)
     const apiUrl = getApiUrl().replace(/\/$/, "");
     window.open(
@@ -196,16 +196,16 @@ function App() {
       <div className="login-container">
         <h1>SpotiUI Kiosk</h1>
         <p>Status: {isConnected ? 'Connected' : 'Disconnected'}</p>
-        
+
         {loginUrl && (
-            <div style={{ background: 'white', padding: '1rem', borderRadius: '1rem', margin: '2rem' }}>
-                <QRCodeSVG value={loginUrl} size={256} />
-            </div>
+          <div style={{ background: 'white', padding: '1rem', borderRadius: '1rem', margin: '2rem' }}>
+            <QRCodeSVG value={loginUrl} size={256} />
+          </div>
         )}
         <p style={{ color: '#aaa', marginTop: '1rem' }}>Scan to Login</p>
-        
+
         <button onClick={handleLogin} disabled={!isConnected} style={{ marginTop: '2rem', fontSize: '1rem', padding: '0.5rem 1rem' }}>
-           Or click here (Debug)
+          Or click here (Debug)
         </button>
       </div>
     );
@@ -219,17 +219,17 @@ function App() {
         <div className="app-container" style={{ justifyContent: 'center' }}>
           {!isConnected && (
             <div style={{
-                position: 'absolute',
-                top: '1rem',
-                right: '1rem',
-                background: 'rgba(255, 0, 0, 0.7)',
-                color: 'white',
-                padding: '0.5rem 1rem',
-                borderRadius: '8px',
-                zIndex: 1000,
-                backdropFilter: 'blur(4px)'
+              position: 'absolute',
+              top: '1rem',
+              right: '1rem',
+              background: 'rgba(255, 0, 0, 0.7)',
+              color: 'white',
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              zIndex: 1000,
+              backdropFilter: 'blur(4px)'
             }}>
-                Reconnecting...
+              Reconnecting...
             </div>
           )}
           <div className="glass-panel waiting-panel">
@@ -250,75 +250,77 @@ function App() {
 
   const { item, isPlaying } = data.playback;
   const image = item?.album?.images?.[0]?.url;
-  const duration = item?.duration || 1; 
+  const duration = item?.duration || 1;
   const progressPercent = (localProgress / duration) * 100;
 
   return (
     <>
-      <div 
-        className="background-image" 
-        style={{ backgroundImage: `url(${image})` }} 
+      <div
+        className="background-image"
+        style={{ backgroundImage: `url(${image})` }}
       />
-      <div 
-        className="background-overlay" 
-        style={{ backgroundColor: dominantColor }} 
+      <div
+        className="background-overlay"
+        style={{ backgroundColor: dominantColor }}
       />
-      
+
       <div className="app-container">
         {!isConnected && (
-            <div style={{
-                position: 'absolute',
-                top: '1rem',
-                right: '1rem',
-                background: 'rgba(255, 0, 0, 0.7)',
-                color: 'white',
-                padding: '0.5rem 1rem',
-                borderRadius: '8px',
-                zIndex: 1000,
-                backdropFilter: 'blur(4px)'
-            }}>
-                Reconnecting...
-            </div>
+          <div style={{
+            position: 'absolute',
+            top: '1rem',
+            right: '1rem',
+            background: 'rgba(255, 0, 0, 0.7)',
+            color: 'white',
+            padding: '0.5rem 1rem',
+            borderRadius: '8px',
+            zIndex: 1000,
+            backdropFilter: 'blur(4px)'
+          }}>
+            Reconnecting...
+          </div>
         )}
-        <div className="glass-panel now-playing">
+
+          <div style={{
+            position: 'absolute',
+            height: "100svh",
+            width: "100svw",
+            top: 0,
+            left: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.566)',
+            fontSize: '3rem',
+            fontWeight: 'bold',
+            color: dominantColor,
+            zIndex: 1000,
+            backdropFilter: 'blur(12px)',
+            opacity: isPlaying ? 0 : 1,
+            pointerEvents: isPlaying ? 'none' : 'all',
+            transition: 'opacity 0.3s ease-in-out'
+          }}>
+            Paused
+          </div>
+
+        <div className="now-playing">
           {image && <img src={image} alt="Album Art" className="album-art" />}
           <div className="track-info">
             <h1 className="track-name">{item?.name}</h1>
             <h2 className="artist-name">{item?.artists?.map(a => a.name).join(', ')}</h2>
             <p className="album-name">{item?.album?.name}</p>
-            
-            <div className="progress-container">
-               <div className="progress-bar-bg">
-                  <div 
-                    className="progress-bar-fill" 
-                    style={{ 
-                      width: `${progressPercent}%`, 
-                      backgroundColor: dominantColor,
-                      boxShadow: `0 0 15px ${dominantColor}`
-                    }}
-                  />
-               </div>
-               <div className="time-labels">
-                 <span>{formatTime(localProgress)}</span>
-                 <span>{formatTime(duration)}</span>
-               </div>
-            </div>
-
-            <div className="status-badge">
-              {isPlaying ? '▶ Playing' : '⏸ Paused'}
-            </div>
           </div>
         </div>
-        
+
         {data.queue && (
           <div className="glass-panel queue-container">
             <h3>Up Next</h3>
             <div className="queue-list">
-              {data.queue.queue.slice(0, 4).map((track, i) => (
+              {data.queue.queue.slice(0, 5).map((track, i) => (
                 <div key={i} className="queue-item">
-                  <img 
-                    src={track.album.images[0]?.url} 
-                    alt={track.album.name} 
+                  <img
+                    src={track.album.images[0]?.url}
+                    alt={track.album.name}
                   />
                   <div className="queue-text">
                     <span className="queue-track-name">{track.name}</span>
@@ -329,6 +331,23 @@ function App() {
             </div>
           </div>
         )}
+
+        <div className="progress-container">
+          <div className="progress-bar-bg">
+            <div
+              className="progress-bar-fill"
+              style={{
+                width: `${progressPercent}%`,
+                backgroundColor: dominantColor,
+                boxShadow: `0 0 15px ${dominantColor}`
+              }}
+            />
+          </div>
+          <div className="time-labels">
+            <span>{formatTime(localProgress)}</span>
+            <span>{formatTime(duration)}</span>
+          </div>
+        </div>
       </div>
     </>
   );
