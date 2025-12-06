@@ -1,10 +1,10 @@
+import cors from 'cors';
+import crypto from 'crypto';
+import dotenv from 'dotenv';
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import cors from 'cors';
-import dotenv from 'dotenv';
 import { Client } from 'spotify-api.js';
-import crypto from 'crypto';
 
 dotenv.config();
 
@@ -12,7 +12,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*", 
+    origin: "*",
     methods: ["GET", "POST"]
   },
   pingTimeout: 60000, // Increase to 60 seconds
@@ -113,15 +113,15 @@ app.get('/callback', async (req, res) => {
     // BUT the user wants the client to store tokens. 
     // We need to extract the refresh token.
     // In `spotify-api.js`, `client.refreshMeta` might hold it.
-    
+
     const refreshToken = client.refreshMeta?.refreshToken;
-    
+
     console.log(`Login success for socket ${socketId}. Access Token present. Refresh Token present: ${!!refreshToken}`);
 
     // Send tokens to the connected client via WebSocket
-    io.to(socketId).emit('login_success', { 
-      accessToken, 
-      refreshToken: refreshToken || '' 
+    io.to(socketId).emit('login_success', {
+      accessToken,
+      refreshToken: refreshToken || ''
     });
 
     res.send(`
@@ -157,11 +157,18 @@ function startPolling(socketId: string, client: Client) {
   const poll = async () => {
     try {
       // Fetch in parallel for speed
-      const [playback, queue] = await Promise.all([
-         client.user.player.getCurrentPlayback(),
-         client.fetch('/me/player/queue')
-      ]);
-      
+      let playback, queue;
+
+      if (client.user.product === "premium") {
+        [playback, queue] = await Promise.all([
+          client.user.player.getCurrentPlayback(),
+          client.fetch('/me/player/queue')
+        ]);
+      } else {
+        playback = await client.user.player.getCurrentPlayback();
+        queue = await client.fetch('/me/player/queue');
+      }
+
       console.log(`Socket ${socketId} playback update:`, playback ? `Playing: ${playback.item?.name}` : "No playback");
 
       io.to(socketId).emit('playback_update', {
@@ -169,7 +176,7 @@ function startPolling(socketId: string, client: Client) {
         queue
       });
     } catch (error) {
-        console.error(`Error polling for socket ${socketId}:`, error);
+      console.error(`Error polling for socket ${socketId}:`, error);
     }
   };
 
@@ -188,44 +195,44 @@ io.on('connection', (socket) => {
   socket.on('authenticate', async ({ accessToken, refreshToken }) => {
     console.log(`Received authenticate request for socket ${socket.id}`);
     try {
-        let client;
-        // Sanitize refreshToken
-        const validRefreshToken = (refreshToken && refreshToken !== 'undefined' && refreshToken !== '') ? refreshToken : null;
+      let client;
+      // Sanitize refreshToken
+      const validRefreshToken = (refreshToken && refreshToken !== 'undefined' && refreshToken !== '') ? refreshToken : null;
 
-        if (validRefreshToken) {
-             console.log(`Authenticating socket ${socket.id} with Refresh Token`);
-             client = await Client.create({
-                token: {
-                    clientID: SPOTIFY_CLIENT_ID!,
-                    clientSecret: SPOTIFY_CLIENT_SECRET!,
-                    redirectURL: SPOTIFY_REDIRECT_URI!,
-                    refreshToken: validRefreshToken
-                }
-            });
-        } else {
-             console.log(`Authenticating socket ${socket.id} with Access Token only`);
-             client = await Client.create({
-                token: {
-                    clientID: SPOTIFY_CLIENT_ID!,
-                    clientSecret: SPOTIFY_CLIENT_SECRET!,
-                    redirectURL: SPOTIFY_REDIRECT_URI!,
-                    code: "dummy" 
-                }
-            });
-            client.token = accessToken;
-        }
+      if (validRefreshToken) {
+        console.log(`Authenticating socket ${socket.id} with Refresh Token`);
+        client = await Client.create({
+          token: {
+            clientID: SPOTIFY_CLIENT_ID!,
+            clientSecret: SPOTIFY_CLIENT_SECRET!,
+            redirectURL: SPOTIFY_REDIRECT_URI!,
+            refreshToken: validRefreshToken
+          }
+        });
+      } else {
+        console.log(`Authenticating socket ${socket.id} with Access Token only`);
+        client = await Client.create({
+          token: {
+            clientID: SPOTIFY_CLIENT_ID!,
+            clientSecret: SPOTIFY_CLIENT_SECRET!,
+            redirectURL: SPOTIFY_REDIRECT_URI!,
+            code: "dummy"
+          }
+        });
+        client.token = accessToken;
+      }
 
-        spotifyClients.set(socket.id, client);
-        
-        // Emit login_success with NO tokens to avoid client re-authentication loop
-        // The client only re-emits 'authenticate' if tokens are present in the payload
-        socket.emit('login_success');
-        
-        console.log(`Authentication successful for socket ${socket.id}. Starting polling.`);
-        startPolling(socket.id, client);
-        
+      spotifyClients.set(socket.id, client);
+
+      // Emit login_success with NO tokens to avoid client re-authentication loop
+      // The client only re-emits 'authenticate' if tokens are present in the payload
+      socket.emit('login_success');
+
+      console.log(`Authentication successful for socket ${socket.id}. Starting polling.`);
+      startPolling(socket.id, client);
+
     } catch (e) {
-        console.error(`Auth failed for socket ${socket.id}:`, e);
+      console.error(`Auth failed for socket ${socket.id}:`, e);
     }
   });
 
