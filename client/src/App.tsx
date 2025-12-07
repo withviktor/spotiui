@@ -291,27 +291,35 @@ function App() {
           </div>
         )}
 
-          <div style={{
-            position: 'absolute',
-            height: "100svh",
-            width: "100svw",
-            top: 0,
-            left: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(0, 0, 0, 0.566)',
-            fontSize: '3rem',
-            fontWeight: 'bold',
-            color: dominantColor,
-            zIndex: 1000,
-            backdropFilter: 'blur(12px)',
-            opacity: isPlaying ? 0 : 1,
-            pointerEvents: isPlaying ? 'none' : 'all',
-            transition: 'opacity 0.3s ease-in-out'
-          }}>
-            Paused
-          </div>
+        <div style={{
+          position: 'absolute',
+          height: "100svh",
+          width: "100svw",
+          top: 0,
+          left: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(0, 0, 0, 0.566)',
+          fontSize: '1.5rem',
+          fontWeight: 'bold',
+          color: dominantColor,
+          zIndex: 1000,
+          backdropFilter: 'blur(12px)',
+          opacity: isPlaying ? 0 : 1,
+          pointerEvents: isPlaying ? 'none' : 'all',
+          transition: 'opacity 0.3s ease-in-out'
+        }}>
+          {loginUrl && (
+            <div style={{ background: 'white', padding: '1rem', borderRadius: '1rem', margin: '2rem' }}>
+              <QRCodeSVG value={loginUrl} size={256} />
+            </div>
+          )}
+          <p style={{ marginTop: '1rem', textAlign: 'center' }}>
+            Playback is paused <br /> To switch accounts, scan the QR code again
+          </p>
+        </div>
 
         <div className="now-playing">
           {image && <img src={image} alt="Album Art" className="album-art" />}
