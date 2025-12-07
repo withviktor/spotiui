@@ -1,7 +1,7 @@
-import { useEffect, useState, useRef } from 'react';
-import { io, Socket } from 'socket.io-client';
 import { FastAverageColor } from 'fast-average-color';
 import { QRCodeSVG } from 'qrcode.react';
+import { useEffect, useRef, useState } from 'react';
+import { io, Socket } from 'socket.io-client';
 import './App.css';
 
 const getApiUrl = () => {
@@ -212,9 +212,11 @@ function App() {
         )}
         <p style={{ color: '#aaa', marginTop: '1rem' }}>Scan to Login</p>
 
-        <button onClick={handleLogin} disabled={!isConnected} style={{ marginTop: '2rem', fontSize: '1rem', padding: '0.5rem 1rem' }}>
-          Or click here (Debug)
-        </button>
+        {process.env.NODE_ENV === 'development' && (
+          <button onClick={handleLogin} disabled={!isConnected} style={{ marginTop: '2rem', fontSize: '1rem', padding: '0.5rem 1rem' }}>
+            Or click here (Debug)
+          </button>
+        )}
       </div>
     );
   }
